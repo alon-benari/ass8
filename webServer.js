@@ -165,8 +165,10 @@ app.get('/user/list', function (request, response) {
                 delete el.description;
                 delete el.occupation;
                 usersStack.push(el);
+                console.log('usersStack:',usersStack)
                 // console.log(usersStack);
             });
+            
             response.status(200).send(usersStack);
         }else {
             console.log('we have a problem: ',err);
@@ -227,14 +229,18 @@ app.post('/admin/login',function(req,res){
                 if ( person.password === req.body.pswd){//
                      console.log('we got a match pswd and user name');
                 req.session.user = person.first_name; // store user in the session.//
-                req.session.user_id = person._id
+                req.session.user_id = person._id // keep the id
                 console.log('successful login:',req.session.user)
                 console.log(person._id);//
                 // update login time:
                 person.login_date_time = new  Date()//
                 person.save(function(err){//
                     if (err){
+                        console.log(err)
                         res.status(500).send(err)
+                    } else {
+                        console.log('updated login time correctly, updating ')
+
                     }
                 })
                 res.status(200).send(person);//
@@ -266,11 +272,7 @@ app.post('/admin/logout', function(req,res){
     User.findOne({_id:req.session.user_id},function(err,userInfo){
         if (!err){
             userInfo.logout_date_time = new Date()
-            userInfo.save(function(err){
-                if (err){
-                    res.status(404).send(err)
-                }
-            })
+            userInfo.save()
         }
     })  
     console.log('killing session');
@@ -332,10 +334,7 @@ app.get('/user/:id', function (request, response) {
                                 console.log('commentsCount:',commentsCount)
                                 var lengthArray = []
                                 commentsCount.forEach(function(el){
-                                    // console.log(el.comments.length)
-                                    // object = {
-                                    //     el._id:el.comments.length
-                                    // }
+                                    
                                     lengthArray.push(el.comments.length)
                                     
                                 })
@@ -440,6 +439,53 @@ app.get('/photosOfUser/:id', function (request, response) {
    
     
 });
+
+app.post('/addtofavs/:photo_id',function(req,res) {
+    if (req.session.user === 'undefined') {
+        return;
+    }
+    console.log('photo_id',req.params.photo_id)
+    console.log('user is',req.session.user)
+    console.log('_id:',req.session.user_id)
+    // add list of favorites in Photos
+    Photo.findOne({_id:req.params.photo_id},function(err,add2Favs){
+        if(!err) {
+            var fav_usr = {
+                user_id:req.session.user_id,
+                user:req.session.user,
+                disable:true,
+                file_name:add2Favs.file_name
+            }
+            var tempFavUserList = add2Favs.favrd_by
+            tempFavUserList.push(fav_usr)
+            add2Favs.favrd_by = tempFavUserList
+            add2Favs.save(function(err){
+                if (!err){
+                     // add to list of favorite of user that made the photo favorite.
+                    User.findOne({_id:req.session.user_id},function(err,add2UserFavList){
+                if (!err){
+                    var userFavListData = {
+                        file_name:add2Favs.file_name,
+                        photo_id:req.params.photo_id
+                    }
+                    console.log('userFavListData:',userFavListData)
+                    var tempUserFavList  = add2UserFavList.favorites
+                    tempUserFavList.push(userFavListData)
+                    add2UserFavList.favorites = tempUserFavList
+                    console.log('*',tempUserFavList)
+                    add2UserFavList.save()
+                    res.status(200).send(add2Favs)
+                }
+
+                
+            })    
+                }
+            })
+        } 
+
+    })
+
+})
 
 app.post('/commentsOfPhoto/:photo_id', function(req, res){
     if (req.session.user === 'undefined') {

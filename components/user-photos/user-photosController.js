@@ -78,5 +78,15 @@ cs142App.controller('UserPhotosController', ['$scope', '$routeParams','$resource
       
     };
     
-
+    $scope.addToFavorties = function(){
+      var img_id = this.x._id;
+      console.log('img_id: ',img_id)
+      // add looged user to fav list
+      var addFavToPhoto = $resource('/addtofavs/:photo_id');
+      addFavToPhoto.save({photo_id:img_id},{}, function (comment){
+      console.log(comment);
+      $location.path($location.path())
+              
+      });
+    }
   }]);

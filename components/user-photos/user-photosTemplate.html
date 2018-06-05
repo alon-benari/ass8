@@ -8,9 +8,18 @@
     <p>creation date: {{x.date_time}}</p>
     <form ng-submit = "addComment()" method = "POST" >
       <input type="text" placeholder="enter new comment (120 chars.)" ng-model = "addComment.newComment" size = "120"><br>
-      <button  id = "{{x._id}}"type = "submit" >add new comment</button>
+      <button  id = "{{x._id}}" type = "submit" >add new comment</button> 
    </form>
-  
+   <md-button class="md-raised" id = "{{x._id}}"   ng-click = "addToFavorties()">add to favorites</md-button> <br>
+   favored by the following users: 
+   <div ng-repeat = "f in x.favrd_by">
+     <ul>
+       {{f.user}}
+     </ul>
+      
+    </div> 
+    
+    
    <div ng-repeat = "c in x.comments">
      <p id = "{{x._id}}" >
        
@@ -20,11 +29,8 @@
      <a href="#!/users/{{c.user._id}}"> {{'comment posted by: '+c.user.first_name+' '+c.user.last_name}}</a>
    </div>
    <br>
+  
   </div>
    
-   <!-- <form ng-submit = "addComment()" method = "POST" >
-      <input type="text" placeholder="enter new comment (120 chars.)" ng-model = "addComment.newComment" size = "120"><br>
-      <button type = "submit">add new comment</button>
-
-   </form> -->
+ 
 </div>

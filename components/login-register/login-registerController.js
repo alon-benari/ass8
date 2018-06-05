@@ -16,7 +16,8 @@ cs142App.controller('LoginRegisterController', ['$scope','$resource','$location'
                },function errorHandling(err){
                  $scope.formData.error = err.data.err; //'User Was not found consider registering.'
                });
-                 
+               $scope.$apply();
+               $location.path($location.path())
              };
 
          $scope.register = function(){
@@ -67,7 +68,7 @@ cs142App.controller('LoginRegisterController', ['$scope','$resource','$location'
           } else {
             $scope.register.err ='Passwords mis-match, try again';
           }
-         
+          $scope.$apply();
           
         };
       

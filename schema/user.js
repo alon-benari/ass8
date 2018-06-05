@@ -6,6 +6,12 @@
 
 var mongoose = require('mongoose');
 
+var favoriteSchema = new mongoose.Schema({
+    file_name:String,
+    photo_id:String,
+    _id:mongoose.Schema.Types.ObjectId
+
+})
 // create a schema
 var userSchema = new mongoose.Schema({
     first_name: String, // First name of the user.
@@ -19,7 +25,9 @@ var userSchema = new mongoose.Schema({
     logout_date_time: {type: Date, default:null},
     registered_date_time: {type: Date, default: Date.now},
     posted_photo_date_time: {type:Date, default:null},
-    recent_comment_date_time:{type:Date, default: null}
+    recent_comment_date_time:{type:Date, default: null},
+    favorites:[favoriteSchema]
+    
 });
 
 // the schema is useless so far
